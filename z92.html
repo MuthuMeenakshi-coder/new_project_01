@@ -1,0 +1,625 @@
+<!-- circular -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic vLEI Escrow Flow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #ffffff;
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+        }
+        
+        .flow-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            width: 100%;
+            position: relative;
+        }
+        
+        .circular-flow {
+            position: relative;
+            width: 700px;
+            height: 700px;
+            margin: 0 auto;
+        }
+        
+        .step {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f1f8ff;
+            border: 3px solid #bdc3c7;
+            transition: all 0.5s ease;
+            cursor: pointer;
+            z-index: 2;
+            text-align: center;
+            padding: 8px;
+        }
+        
+        .step.active {
+            background: #2196f3;
+            color: white;
+            border-color: #1976d2;
+            box-shadow: 0 0 25px rgba(33, 150, 243, 0.7);
+            transform: scale(1.2);
+            z-index: 3;
+            animation: pulse 2s infinite;
+        }
+        
+        .step.completed {
+            background: #4caf50;
+            color: white;
+            border-color: #388e3c;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(33, 150, 243, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
+            }
+        }
+        
+        .step-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .step-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            line-height: 1.1;
+        }
+        
+        .flow-line {
+            position: absolute;
+            background: #bdc3c7;
+            height: 4px;
+            transform-origin: 0 0;
+            z-index: 1;
+            transition: all 0.5s ease;
+        }
+        
+        .flow-line.active {
+            background: #2196f3;
+            box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+        }
+        
+        .flow-line.completed {
+            background: #4caf50;
+        }
+        
+        .step-details {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 600px;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .details-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .details-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+        }
+        
+        .details-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            flex: 1;
+        }
+        
+        .details-agent {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #2196f3;
+            color: white;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .details-content {
+            white-space: pre-line;
+            line-height: 1.6;
+            color: #34495e;
+            font-size: 0.95rem;
+        }
+        
+        .progress-container {
+            margin-top: 40px;
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2196f3, #4caf50);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            background: #2196f3;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:hover {
+            background: #1976d2;
+            transform: translateY(-3px);
+        }
+        
+        button#resetFlow {
+            background: #f44336;
+        }
+        
+        button#resetFlow:hover {
+            background: #d32f2f;
+        }
+        
+        .completion-message {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-radius: 10px;
+            display: none;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        @media (max-width: 768px) {
+            .circular-flow {
+                width: 500px;
+                height: 500px;
+            }
+            
+            .step {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .step-icon {
+                font-size: 1.5rem;
+            }
+            
+            .step-name {
+                font-size: 0.7rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .circular-flow {
+                width: 400px;
+                height: 400px;
+            }
+            
+            .step {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .step-icon {
+                font-size: 1.3rem;
+            }
+            
+            .step-name {
+                font-size: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Agentic vLEI Escrow Flow</h1>
+            <p class="subtitle">Real-time agent-to-agent communication via A2A protocol</p>
+        </header>
+        
+        <div class="flow-container">
+            <div class="circular-flow" id="circularFlow">
+                <!-- Steps and lines will be dynamically added here -->
+            </div>
+        </div>
+        
+        <div class="step-details" id="stepDetails">
+            <div class="details-header">
+                <div class="details-icon">📄</div>
+                <div class="details-title">Step Details</div>
+                <div class="details-agent">AGENT</div>
+            </div>
+            <div id="detailsContent" class="details-content">Click on any step or start the flow to see detailed information.</div>
+        </div>
+        
+        <div class="progress-container">
+            <h3>Transaction Progress</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="controls">
+                <button id="startFlow">Start Flow</button>
+                <button id="resetFlow">Reset Flow</button>
+            </div>
+        </div>
+        
+        <div class="completion-message" id="completionMessage">
+            <h2>Flow Complete!</h2>
+            <p>All steps successfully verified</p>
+            <p>Completed at: <span id="completionTime"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Flow data with corrected percentages and amounts
+        const flowSteps = [
+            {
+                "agent": "buyer",
+                "text": "Creating and sending Purchase Order to Escrow",
+                "state": "INIT",
+                "artifact": "PO ID: PO-2025-4431\nProduct: Quantum Processing Unit QPU-9000\nAmount: $250,000\nTerms: 40% upfront, 60% on delivery\nBuyer: Quantum Computing Inc.\nDelivery: Within 30 days",
+                "icon": "📄",
+                "name": "Create PO",
+                "delay": 1000
+            },
+            {
+                "agent": "seller",
+                "text": "Purchase Order received and acknowledged",
+                "state": "INIT",
+                "artifact": "PO ID: PO-2025-4431\nProduct: QPU-9000 Quantum Processor\nAmount: $250,000\nTerms: 40/60 payment schedule\nSeller: NanoTech Manufacturing\nStatus: Under Review",
+                "icon": "📋",
+                "name": "Acknowledge PO",
+                "delay": 2000
+            },
+            {
+                "agent": "buyer",
+                "text": "Sending 40% upfront payment to Escrow",
+                "state": "FUNDED",
+                "artifact": "Payment: 40% upfront\nAmount: $100,000\nTX Hash: 9b8a7c6d5e4f3a2b\nFrom: BUY-7F3E-9A2B-5C8D\nTo: ESC-5C8D-7F3E-9A2B\nStatus: Processing",
+                "icon": "💰",
+                "name": "40% Payment",
+                "delay": 3000
+            },
+            {
+                "agent": "escrow",
+                "text": "Payment verified & escrow balance updated",
+                "state": "FUNDED",
+                "artifact": "Payment: 40% received\nAmount: $100,000\nEscrow Balance: $100,000 (40%)\nTX Confirmed: ✓\nNext Step: Awaiting PO acceptance\nSecurity: vLEI Verified",
+                "icon": "✅",
+                "name": "Verify Payment",
+                "delay": 3500
+            },
+            {
+                "agent": "seller",
+                "text": "Generating and sending Invoice",
+                "state": "INVOICE_SENT",
+                "artifact": "Invoice ID: INV-8821-4C9E\nAmount: $250,000\nDue: Upon delivery\nItems: QPU-9000 Quantum Processor\nSeller: NanoTech Manufacturing\nStatus: Sent to Buyer",
+                "icon": "🧾",
+                "name": "Send Invoice",
+                "delay": 4500
+            },
+            {
+                "agent": "escrow",
+                "text": "Releasing 40% advance to Seller",
+                "state": "RELEASED",
+                "artifact": "Payment: 40% advance\nAmount: $100,000\nTo: SEL-9A2B-5C8D-7F3E\nEscrow Balance: $0 (0%)\nStatus: Released ✓\nConditions: PO Accepted + Invoice Received",
+                "icon": "🚀",
+                "name": "Release 40%",
+                "delay": 5000
+            },
+            {
+                "agent": "seller",
+                "text": "40% advance payment received",
+                "state": "PAYMENT_RECEIVED",
+                "artifact": "Payment: 40% advance\nAmount: $100,000\nFrom: ESC-5C8D-7F3E-9A2B\nTo: SEL-9A2B-5C8D-7F3E\nStatus: Confirmed ✓\nBalance: $100,000 received\nRemaining: $150,000",
+                "icon": "💳",
+                "name": "Receive 40%",
+                "delay": 5500
+            },
+            {
+                "agent": "seller",
+                "text": "Goods shipped with tracking details",
+                "state": "SHIPPED",
+                "artifact": "Tracking: HYP-8829-3301-BZ92\nCarrier: Hyperloop Express\nDispatch: Today\nEst. Delivery: 5 days\nInsurance: Full coverage\nStatus: In Transit",
+                "icon": "📦",
+                "name": "Ship Goods",
+                "delay": 7500
+            },
+            {
+                "agent": "buyer",
+                "text": "Delivery confirmed",
+                "state": "DELIVERED",
+                "artifact": "Tracking: HYP-8829-3301-BZ92\nStatus: Delivered ✓\nCondition: Excellent\nConfirmation: DC-7742-9931\nTimestamp: Verified\nSatisfaction: Confirmed",
+                "icon": "🎯",
+                "name": "Confirm Delivery",
+                "delay": 8500
+            },
+            {
+                "agent": "buyer",
+                "text": "Sending final 60% payment to Escrow",
+                "state": "FUNDED",
+                "artifact": "Payment: 60% final\nAmount: $150,000\nTX Hash: f8g7h6i5j4k3l2m1\nFrom: BUY-7F3E-9A2B-5C8D\nTo: ESC-5C8D-7F3E-9A2B\nStatus: Processing",
+                "icon": "💰",
+                "name": "Final Payment",
+                "delay": 10000
+            },
+            {
+                "agent": "escrow",
+                "text": "Final payment received & balance updated",
+                "state": "FUNDED",
+                "artifact": "Payment: 60% received\nAmount: $150,000\nEscrow Balance: $150,000 (60%)\nTX Confirmed: ✓\nNext: Release to Seller\nConditions: All Met",
+                "icon": "✅",
+                "name": "Verify Final",
+                "delay": 10500
+            },
+            {
+                "agent": "seller",
+                "text": "Final 60% payment received",
+                "state": "PAYMENT_RECEIVED",
+                "artifact": "Payment: 60% final\nAmount: $150,000\nFrom: ESC-5C8D-7F3E-9A2B\nTo: SEL-9A2B-5C8D-7F3E\nStatus: Confirmed ✓\nTotal Received: $250,000\nTransaction: Complete",
+                "icon": "💳",
+                "name": "Receive Final",
+                "delay": 11500
+            },
+            {
+                "agent": "escrow",
+                "text": "Transaction marked as COMPLETE",
+                "state": "COMPLETE",
+                "artifact": "Status: COMPLETE ✓\nTX: ESC-8A3F-B2C9-7D1E\nAll Conditions: Met\nProof Package: PK3j8s7L...\nvLEI: Verified ✓\nArchive: Secured",
+                "icon": "🏁",
+                "name": "Complete",
+                "delay": 12000
+            }
+        ];
+
+        // DOM elements
+        const circularFlow = document.getElementById('circularFlow');
+        const stepDetails = document.getElementById('stepDetails');
+        const detailsContent = document.getElementById('detailsContent');
+        const detailsAgent = document.querySelector('.details-agent');
+        const detailsTitle = document.querySelector('.details-title');
+        const detailsIcon = document.querySelector('.details-icon');
+        const progressFill = document.getElementById('progressFill');
+        const startFlowBtn = document.getElementById('startFlow');
+        const resetFlowBtn = document.getElementById('resetFlow');
+        const completionMessage = document.getElementById('completionMessage');
+        const completionTime = document.getElementById('completionTime');
+
+        // Initialize the circular flow
+        function initializeFlow() {
+            circularFlow.innerHTML = '';
+            
+            const radius = 280; // Increased radius for better spacing
+            const centerX = 350; // Center X of the circle
+            const centerY = 350; // Center Y of the circle
+            const totalSteps = flowSteps.length;
+            
+            // Create steps and connecting lines
+            flowSteps.forEach((step, index) => {
+                // Calculate position for this step
+                const angle = (index / totalSteps) * 2 * Math.PI - Math.PI / 2; // Start from top
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                
+                // Create step element
+                const stepElement = document.createElement('div');
+                stepElement.className = 'step';
+                stepElement.dataset.index = index;
+                stepElement.style.left = `${x - 50}px`; // Center the step (50px = half of 100px width)
+                stepElement.style.top = `${y - 50}px`; // Center the step (50px = half of 100px height)
+                
+                stepElement.innerHTML = `
+                    <div class="step-icon">${step.icon}</div>
+                    <div class="step-name">${step.name}</div>
+                `;
+                
+                // Add click event to show details
+                stepElement.addEventListener('click', () => showStepDetails(step));
+                
+                circularFlow.appendChild(stepElement);
+                
+                // Create connecting line to next step
+                if (index < totalSteps - 1) {
+                    const nextAngle = ((index + 1) / totalSteps) * 2 * Math.PI - Math.PI / 2;
+                    const nextX = centerX + radius * Math.cos(nextAngle);
+                    const nextY = centerY + radius * Math.sin(nextAngle);
+                    
+                    // Calculate line length and angle
+                    const lineLength = Math.sqrt(Math.pow(nextX - x, 2) + Math.pow(nextY - y, 2));
+                    const lineAngle = Math.atan2(nextY - y, nextX - x) * 180 / Math.PI;
+                    
+                    const lineElement = document.createElement('div');
+                    lineElement.className = 'flow-line';
+                    lineElement.dataset.index = index;
+                    lineElement.style.width = `${lineLength}px`;
+                    lineElement.style.left = `${x}px`;
+                    lineElement.style.top = `${y}px`;
+                    lineElement.style.transform = `rotate(${lineAngle}deg)`;
+                    
+                    circularFlow.appendChild(lineElement);
+                }
+            });
+            
+            progressFill.style.width = '0%';
+            completionMessage.style.display = 'none';
+            
+            // Reset details panel
+            detailsContent.textContent = 'Click on any step or start the flow to see detailed information.';
+            detailsAgent.textContent = 'AGENT';
+            detailsTitle.textContent = 'Step Details';
+            detailsIcon.textContent = '📄';
+        }
+
+        // Show step details
+        function showStepDetails(step) {
+            detailsIcon.textContent = step.icon;
+            detailsTitle.textContent = step.text;
+            detailsAgent.textContent = step.agent.toUpperCase();
+            detailsContent.textContent = step.artifact;
+        }
+
+        // Animate the flow
+        function animateFlow() {
+            let totalDelay = 0;
+            let isCompleted = false;
+            
+            flowSteps.forEach((step, index) => {
+                setTimeout(() => {
+                    if (isCompleted) return; // Stop if already completed
+                    
+                    // Get all step and line elements
+                    const stepElements = document.querySelectorAll('.step');
+                    const lineElements = document.querySelectorAll('.flow-line');
+                    
+                    // Remove active class from all steps
+                    stepElements.forEach(el => el.classList.remove('active'));
+                    
+                    // Activate current step
+                    stepElements[index].classList.add('active');
+                    
+                    // Activate previous line (if exists)
+                    if (index > 0) {
+                        lineElements[index-1].classList.add('active');
+                    }
+                    
+                    // Show step details
+                    showStepDetails(step);
+                    
+                    // Update progress bar
+                    const progress = ((index + 1) / flowSteps.length) * 100;
+                    progressFill.style.width = `${progress}%`;
+                    
+                    // Mark previous steps as completed
+                    for (let i = 0; i < index; i++) {
+                        stepElements[i].classList.remove('active');
+                        stepElements[i].classList.add('completed');
+                        
+                        if (i > 0) {
+                            lineElements[i-1].classList.remove('active');
+                            lineElements[i-1].classList.add('completed');
+                        }
+                    }
+                    
+                    // If last step, show completion message and stop
+                    if (index === flowSteps.length - 1) {
+                        setTimeout(() => {
+                            stepElements[index].classList.remove('active');
+                            stepElements[index].classList.add('completed');
+                            lineElements[index-1].classList.remove('active');
+                            lineElements[index-1].classList.add('completed');
+                            
+                            completionMessage.style.display = 'block';
+                            const now = new Date();
+                            completionTime.textContent = now.toLocaleTimeString();
+                            isCompleted = true;
+                        }, 1000);
+                    }
+                }, totalDelay);
+                
+                totalDelay += step.delay;
+            });
+        }
+
+        // Event listeners
+        startFlowBtn.addEventListener('click', () => {
+            initializeFlow();
+            animateFlow();
+        });
+
+        resetFlowBtn.addEventListener('click', initializeFlow);
+
+        // Initialize on page load
+        initializeFlow();
+    </script>
+</body>
+</html>
